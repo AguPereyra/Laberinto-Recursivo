@@ -22,7 +22,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        int size = 10;
+        int size = 20;
         m = new LaberintoGen(size, size);
         primaryStage.setTitle("Laberinto");
         Group root = new Group();
@@ -60,10 +60,53 @@ public class Main extends Application {
      * @return true si la celda es parte de la solucion, sino false
      */
     private boolean resolver(int x, int y) {
+        // Marcamos el punto como visitado
         m.visitar(x, y);
+        // Lo dibujamos de amarillo
         dibujarPunto(x, y, 1);
-
-
+        // Almacenamos el entero de la posicion actual
+        // para ahorrar llamadas a funciones
+        int data = m.getData(x, y);
+        // Verificamos no haber llegado a la salida
+        if(x == m.getW()-1 && y == m.getH()-1){
+            dibujarPunto(x, y, 2);
+            return true;
+        }
+        // Revisamos si podemos ir abajo
+        if((data & 2) == 2 && !m.esVisitado(x, y+1)){
+            
+            if(resolver(x, y+1)){
+                dibujarPunto(x, y, 2);
+                return true;
+            }
+        }
+        // Revisamos si podemos ir arriba
+        if((data & 1) == 1 && !m.esVisitado(x, y-1)){
+   
+            if(resolver(x, y-1)){
+                dibujarPunto(x, y, 2);
+                return true;
+            }
+        }
+        
+        // Revisamos si podemos ir a la izquierda
+        if((data & 8) == 8 && !m.esVisitado(x-1, y)){
+            if(resolver(x-1, y)){
+                dibujarPunto(x, y, 2);
+                return true;
+            }
+        }
+        // Revisamos si podemos ir a la derecha
+        if((data & 4) == 4 && !m.esVisitado(x+1, y)){
+            
+            if(resolver(x+1, y)){
+                dibujarPunto(x, y, 2);
+                return true;
+            }
+        }
+        
+        // Si no pudimos ir a ningún lado, lo marcamos
+        // de rojo y retornamos false
         dibujarPunto(x, y, 0);
         return false;
     }
@@ -88,7 +131,7 @@ public class Main extends Application {
         int radio = 10;
 
         try {
-            Thread.sleep(300);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
